@@ -6,7 +6,7 @@
         {
             "label": "gcc build active file",
             "type": "shell",
-            "command": "gcc -o simulator simulator.c"
+            "command": "gcc -O2 -g simulator.c -o simulator"
         }
     ]
 }
