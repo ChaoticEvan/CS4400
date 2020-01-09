@@ -8,9 +8,11 @@
             "name": "gcc build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "simulator",
-            "args": [],
-            "stopAtEntry": true,
+            "program": "${workspaceRoot}/simulator",
+            "args": [
+                "tests/simple/subl.o"
+            ],
+            "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,

@@ -112,12 +112,9 @@ instruction_t* decode_instructions(unsigned int* bytes, unsigned int num_instruc
   int i;
   for(i = 0; i < num_instructions; ++i)
   {
-    instruction_t temp;
-    temp.opcode = 'a';
-    temp.first_register = 'a';
-    temp.second_register = 'a';
-    temp.immediate = 'a';
-    
+    instruction_t *temp;
+    temp->opcode = 'a';
+
     // Printing bytes array just for testing    
     int j;
     for(j = 0; j < 32; ++j)
@@ -126,7 +123,7 @@ instruction_t* decode_instructions(unsigned int* bytes, unsigned int num_instruc
     }
     printf("\n");
 
-    retval[i] = &temp;
+    retval[i] = temp;
   }      
   printf("-------------------------------\n\n");    
 
