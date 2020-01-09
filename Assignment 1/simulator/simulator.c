@@ -72,7 +72,7 @@ int main(int argc, char** argv)
   // Optionally print the decoded instructions for debugging
   // Will not work until you implement decode_instructions
   // Do not call this function in your submitted final version
-  // print_instructions(instructions, num_instructions);
+  print_instructions(instructions, num_instructions);
 
 
   // Once you have completed Part 1 (decoding instructions), uncomment the below block
@@ -106,15 +106,30 @@ int main(int argc, char** argv)
 */
 instruction_t* decode_instructions(unsigned int* bytes, unsigned int num_instructions)
 {
-  // TODO: Don't return NULL
-  instruction_t* retval = NULL;
+  instruction_t* retval[num_instructions];
+  printf("------Testing Bytes Input------\n");    
 
-  /*
   int i;
-  for(i = ...){
-    retval[i] = (fill in fields based on raw bits);
-  */
+  for(i = 0; i < num_instructions; ++i)
+  {
+    instruction_t temp;
+    temp.opcode = 'a';
+    temp.first_register = 'a';
+    temp.second_register = 'a';
+    temp.immediate = 'a';
     
+    // Printing bytes array just for testing    
+    int j;
+    for(j = 0; j < 32; ++j)
+    {
+      printf("%u ", bytes[j]);
+    }
+    printf("\n");
+
+    retval[i] = &temp;
+  }      
+  printf("-------------------------------\n\n");    
+
   return retval;
 }
 
