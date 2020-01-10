@@ -107,26 +107,18 @@ int main(int argc, char** argv)
 instruction_t* decode_instructions(unsigned int* bytes, unsigned int num_instructions)
 {
   instruction_t* retval[num_instructions];
-  printf("------Testing Bytes Input------\n");    
-
   int i;
   for(i = 0; i < num_instructions; ++i)
   {
     instruction_t *temp;
-    temp->opcode = 'a';
-
-    // Printing bytes array just for testing    
-    int j;
-    for(j = 0; j < 32; ++j)
-    {
-      printf("%u ", bytes[j]);
-    }
-    printf("\n");
+    uint32_t byte = bytes[i];
+    temp->opcode = byte >> 27;
+    temp->first_register = ((byte >> 20) & 0x07C) >> 2;
+    temp->second_register = ((byte >> 16) & 0x003E) >> 2;
+    temp->immediate = byte & 0x0000FFFF;
 
     retval[i] = temp;
   }      
-  printf("-------------------------------\n\n");    
-
   return retval;
 }
 
