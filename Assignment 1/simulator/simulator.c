@@ -106,18 +106,18 @@ int main(int argc, char** argv)
 */
 instruction_t* decode_instructions(unsigned int* bytes, unsigned int num_instructions)
 {
-  instruction_t* retval[num_instructions];
+  int* some_pointer = malloc(num_instructions * sizeof *some_pointer);
+
+  instruction_t* retval;
+  retval = malloc(num_instructions * sizeof *retval);
   int i;
   for(i = 0; i < num_instructions; ++i)
   {
-    instruction_t *temp;
     uint32_t byte = bytes[i];
-    temp->opcode = byte >> 27;
-    temp->first_register = ((byte >> 20) & 0x07C) >> 2;
-    temp->second_register = ((byte >> 16) & 0x003E) >> 2;
-    temp->immediate = byte & 0x0000FFFF;
-
-    retval[i] = temp;
+    retval[i].opcode = byte >> 27;
+    retval[i].first_register = ((byte >> 20) & 0x07C) >> 2;
+    retval[i].second_register = ((byte >> 16) & 0x003E) >> 2;
+    retval[i].immediate = byte & 0x0000FFFF;
   }      
   return retval;
 }
