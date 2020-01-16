@@ -72,12 +72,10 @@ int main(int argc, char** argv)
   // Optionally print the decoded instructions for debugging
   // Will not work until you implement decode_instructions
   // Do not call this function in your submitted final version
-  print_instructions(instructions, num_instructions);
+  //print_instructions(instructions, num_instructions);
 
 
   // Once you have completed Part 1 (decoding instructions), uncomment the below block
-  /*
-
   // Allocate and initialize registers
   int* registers = (int*)malloc(sizeof(int) * NUM_REGS);
   // TODO: initialize register values
@@ -94,8 +92,7 @@ int main(int argc, char** argv)
   while(program_counter != num_instructions * 4)
   {
     program_counter = execute_instruction(program_counter, instructions, registers, memory);
-  }
-  */
+  }  
   
   return 0;
 }
@@ -106,8 +103,6 @@ int main(int argc, char** argv)
 */
 instruction_t* decode_instructions(unsigned int* bytes, unsigned int num_instructions)
 {
-  int* some_pointer = malloc(num_instructions * sizeof *some_pointer);
-
   instruction_t* retval;
   retval = malloc(num_instructions * sizeof *retval);
   int i;
