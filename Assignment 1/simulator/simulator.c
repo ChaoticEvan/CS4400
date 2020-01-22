@@ -79,10 +79,22 @@ int main(int argc, char** argv)
   // Allocate and initialize registers
   int* registers = (int*)malloc(sizeof(int) * NUM_REGS);
   // TODO: initialize register values
+  unsigned int i;
+  for(i = 0; i < NUM_REGS; ++i)
+  {
+    if(i == 6)
+    {
+      registers[i] = 0x0200;
+    }
+    else
+    {
+      registers[i] = 0x0000;
+    }    
+  }
 
   // Stack memory is byte-addressed, so it must be a 1-byte type
   // TODO allocate the stack memory. Do not assign to NULL.
-  unsigned char* memory = NULL;
+  unsigned char* memory = malloc(1024);
 
   // Run the simulation
   unsigned int program_counter = 0;
@@ -126,7 +138,9 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
   // program_counter is a byte address, but instructions are 4 bytes each
   // divide by 4 to get the index into the instructions array
   instruction_t instr = instructions[program_counter / 4];
-  
+
+  int isChanged = 0;
+
   switch(instr.opcode)
   {
     case subl:
@@ -154,8 +168,21 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
       memory[instr.second_register + instr.immediate] = registers[instr.first_register];
       break;
     case movl_imm_reg:
-      registers[instr.first_register] = (short) instr.immediate;
+      registers[instr.first_register] = (long) instr.immediate;
       break;
+    case cmpl: ;
+      short temp = registers[instr.second_register] - registers[instr.first_register];
+      uint16_t byte = registers[16];
+      if(temp == 0)
+      {
+        byte |= 1UL << 6;
+      }
+    case je:
+      if((registers[16] >> 6) & 1UL)
+      {
+        program_counter = instr.immediate;
+        isChanged = 1;
+      }
     case printr:
       printf("%d (0x%x)\n", registers[instr.first_register], registers[instr.first_register]);
       break;
@@ -168,7 +195,14 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
   //       Some instructions jump elsewhere
 
   // program_counter + 4 represents the subsequent instruction
-  return program_counter + 4;
+  if(isChanged == 0)
+  {
+    return program_counter + 4;
+  }
+  else
+  {
+    return program_counter;
+  }
 }
 
 
