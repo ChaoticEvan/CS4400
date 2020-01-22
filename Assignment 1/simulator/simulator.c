@@ -154,10 +154,7 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
       memory[instr.second_register + instr.immediate] = registers[instr.first_register];
       break;
     case movl_imm_reg:
-      // TODO
-      break;
-    case cmpl:
-
+      registers[instr.first_register] = (short) instr.immediate;
       break;
     case printr:
       printf("%d (0x%x)\n", registers[instr.first_register], registers[instr.first_register]);
@@ -165,7 +162,6 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
     case readr:
       scanf("%d", &(registers[instr.first_register]));
       break;      
-    // TODO: Implement remaining instructions
   }
 
   // TODO: Do not always return program_counter + 4
