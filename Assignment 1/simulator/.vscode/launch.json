@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/simulator",
             "args": [
-                "tests/complex/factorial.o"
+                "tests/simple/addl_imm_reg.o"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

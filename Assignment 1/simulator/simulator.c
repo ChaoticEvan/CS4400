@@ -11,7 +11,7 @@
  *
  * Some code and pseudo code has been provided as a starting point.
  *
- * Completed by: STUDENT-FILL-IN
+ * Completed by: Evan Voordeckers
 */
 
 #include <stdio.h>
@@ -129,22 +129,43 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
   
   switch(instr.opcode)
   {
-  case subl:
-    registers[instr.first_register] = registers[instr.first_register] - instr.immediate;
-    break;
-  case addl_reg_reg:
-    registers[instr.second_register] = registers[instr.first_register] + registers[instr.second_register];
-    break;
-  case printr:
-    printf("%d (0x%x)\n", registers[instr.first_register], registers[instr.first_register]);
-    break;
-  case readr:
-    scanf("%d", &(registers[instr.first_register]));
-    break;
+    case subl:
+      registers[instr.first_register] = registers[instr.first_register] - instr.immediate;
+      break;
+    case addl_reg_reg:
+      registers[instr.second_register] = registers[instr.first_register] + registers[instr.second_register];
+      break;
+    case addl_imm_reg:
+      registers[instr.first_register] = instr.immediate + registers[instr.first_register];
+      break;
+    case imull:
+      registers[instr.second_register] = registers[instr.first_register] * registers[instr.second_register];
+      break;
+    case shrl:
+      registers[instr.first_register] = registers[instr.first_register] >> 1;
+      break;
+    case movl_reg_reg:
+      registers[instr.second_register] = registers[instr.first_register];
+      break;
+    case movl_deref_reg:
+      registers[instr.second_register] = memory[instr.first_register + instr.immediate];
+      break;
+    case movl_reg_deref:
+      memory[instr.second_register + instr.immediate] = registers[instr.first_register];
+      break;
+    case movl_imm_reg:
+      // TODO
+      break;
+    case cmpl:
 
-
-  // TODO: Implement remaining instructions
-
+      break;
+    case printr:
+      printf("%d (0x%x)\n", registers[instr.first_register], registers[instr.first_register]);
+      break;
+    case readr:
+      scanf("%d", &(registers[instr.first_register]));
+      break;      
+    // TODO: Implement remaining instructions
   }
 
   // TODO: Do not always return program_counter + 4
