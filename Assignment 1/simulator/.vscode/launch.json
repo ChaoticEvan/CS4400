@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/simulator",
             "args": [
-                "tests/simple/addl_reg_reg.o"
+                "tests/moderate/movl_deref.o"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

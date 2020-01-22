@@ -78,7 +78,6 @@ int main(int argc, char** argv)
   // Once you have completed Part 1 (decoding instructions), uncomment the below block
   // Allocate and initialize registers
   int* registers = (int*)malloc(sizeof(int) * NUM_REGS);
-  // TODO: initialize register values
   unsigned int i;
   for(i = 0; i < NUM_REGS; ++i)
   {
@@ -160,20 +159,36 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
     case imull:
       registers[instr.second_register] = registers[instr.first_register] * registers[instr.second_register];
       break;
-    case shrl:
-      registers[instr.first_register] = registers[instr.first_register] >> 1;
+    case shrl: ;
+      registers[instr.first_register] = registers[instr.first_register] >> 1;;
       break;
     case movl_reg_reg:
       registers[instr.second_register] = registers[instr.first_register];
       break;
     case movl_deref_reg:
-      registers[instr.second_register] = memory[instr.first_register + instr.immediate];
+      if(memory[registers[instr.first_register] + instr.immediate + 1] != 0)
+      {
+        registers[instr.second_register] |= memory[registers[instr.first_register] + instr.immediate] <<  8;
+        registers[instr.second_register] |= memory[registers[instr.first_register] + instr.immediate + 1];
+      }
+      else
+      {
+        registers[instr.second_register] = memory[registers[instr.first_register] + instr.immediate];
+      }      
       break;
     case movl_reg_deref:
-      memory[instr.second_register + instr.immediate] = registers[instr.first_register];
+      if(registers[instr.first_register] > 255)
+      {
+        memory[registers[instr.second_register] + instr.immediate] = (registers[instr.first_register] & 0xff00) >>  8;
+        memory[registers[instr.second_register] + instr.immediate + 1] = (registers[instr.first_register] & 0x00ff);
+      }
+      else
+      {
+        memory[registers[instr.second_register] + instr.immediate] = registers[instr.first_register];      
+      }      
       break;
     case movl_imm_reg:
-      registers[instr.first_register] = (long) instr.immediate;
+      registers[instr.first_register] = instr.immediate;
       break;
     case cmpl: ;
       short temp = registers[instr.second_register] - registers[instr.first_register];
@@ -182,12 +197,18 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
       {
         byte |= 1UL << 6;
       }
+      break;
     case je:
       if((registers[16] >> 6) & 1UL)
       {
-        program_counter = instr.immediate;
+        program_counter = program_counter + instr.immediate + 4;
         isChanged = 1;
       }
+      break;
+    case jmp:
+      program_counter = program_counter + instr.immediate + 4;
+      isChanged = 1;
+      break;
     case printr:
       printf("%d (0x%x)\n", registers[instr.first_register], registers[instr.first_register]);
       break;
