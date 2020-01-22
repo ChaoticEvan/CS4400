@@ -95,6 +95,11 @@ int main(int argc, char** argv)
   // Stack memory is byte-addressed, so it must be a 1-byte type
   // TODO allocate the stack memory. Do not assign to NULL.
   unsigned char* memory = malloc(1024);
+  unsigned int j;
+  for(j = 0; j < 1024; ++j)
+  {
+    memory[i] = 0x0;
+  }
 
   // Run the simulation
   unsigned int program_counter = 0;
@@ -123,7 +128,7 @@ instruction_t* decode_instructions(unsigned int* bytes, unsigned int num_instruc
     uint32_t byte = bytes[i];
     retval[i].opcode = byte >> 27;
     retval[i].first_register = ((byte >> 20) & 0x07C) >> 2;
-    retval[i].second_register = ((byte >> 16) & 0x003E) >> 2;
+    retval[i].second_register = ((byte >> 15) & 0x003E) >> 2;
     retval[i].immediate = byte & 0x0000FFFF;
   }      
   return retval;
