@@ -226,17 +226,24 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
         isChanged = 1;
       }
       break;
-    case jmp:
-      program_counter = program_counter + instr.immediate + 4;
-      isChanged = 1;
-      break;
     case jl:
       if(((registers[16] >> 6) & 1 && (registers[16] >> 7) & 0) || ((registers[16] >> 6) & 0 && (registers[16] >> 7) & 1)) 
       {
         program_counter = program_counter + instr.immediate + 4;
         isChanged = 1;
       }
-      break;  
+      break;
+    case jle:
+      if((((registers[16] >> 6) & 1 && (registers[16] >> 7) & 0) || ((registers[16] >> 6) & 0 && (registers[16] >> 7) & 1) || ((registers[16] >> 6) & 0 && (registers[16] >> 7) & 0)) || (registers[16] >> 6) & 1) 
+      {
+        program_counter = program_counter + instr.immediate + 4;
+        isChanged = 1;
+      }
+      break;
+    case jmp:
+      program_counter = program_counter + instr.immediate + 4;
+      isChanged = 1;
+      break;
     case call:
       registers[6] = registers[6] - 4;
       memory[registers[6]] = program_counter + 4;      
@@ -254,11 +261,6 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
         registers[6] = registers[6] + 4;
         isChanged = 1;
       }
-      
-      // if %esp == 1024, exit simulation
-      // else
-      // program_counter = memory[%esp]
-      // %esp = %esp + 4
       break;    
     case pushl:
       registers[6] = registers[6] - 4;

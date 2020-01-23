@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/simulator",
             "args": [
-                "tests/moderate/cmpl.o"
+                "tests/moderate/jle.o"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
