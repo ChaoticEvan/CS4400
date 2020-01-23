@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/simulator",
             "args": [
-                "tests/moderate/callret.o"
+                "tests/moderate/cmpl.o"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

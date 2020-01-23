@@ -107,7 +107,7 @@ int main(int argc, char** argv)
   // to get the address past the last instruction
   while(program_counter != num_instructions * 4)
   {
-    program_counter = execute_instruction(program_counter, instructions, registers, memory);    
+    program_counter = execute_instruction(program_counter, instructions, registers, memory); 
   }  
   
   return 0;
@@ -144,7 +144,6 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
   instruction_t instr = instructions[program_counter / 4];
 
   int isChanged = 0;
-
   switch(instr.opcode)
   {
     case subl:
@@ -195,12 +194,30 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
       registers[instr.first_register] = instr.immediate;
       break;
     case cmpl: ;
-      short temp = registers[instr.second_register] - registers[instr.first_register];
-      uint16_t byte = registers[16];
-      if(temp == 0)
+      int temp_s = registers[instr.second_register] - registers[instr.first_register];
+      unsigned int temp_u = registers[instr.second_register] - registers[instr.first_register];
+      int byte = 0;
+      // CF
+      if((unsigned int) registers[instr.second_register] < (unsigned int) registers[instr.first_register] || (temp_u > registers[instr.first_register] && temp_u > registers[instr.second_register]))
       {
-        byte |= 1UL << 6;
+        byte |= 1 << 0;
       }
+      // ZF
+      if(registers[instr.second_register] - registers[instr.first_register] == 0)
+      {
+        byte |= 1 << 6;
+      }
+      // SF
+      if(temp_s & (1<<1) && registers[instr.second_register] < registers[instr.first_register])
+      {
+        byte |= 1 << 7;
+      }
+      // OF
+      if(byte & (0<<7) && registers[instr.second_register] < registers[instr.first_register])
+      {
+        byte |= 1 << 11;
+      }
+      registers[16] = byte;
       break;
     case je:
       if((registers[16] >> 6) & 1UL)
@@ -213,6 +230,13 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
       program_counter = program_counter + instr.immediate + 4;
       isChanged = 1;
       break;
+    case jl:
+      if(((registers[16] >> 6) & 1 && (registers[16] >> 7) & 0) || ((registers[16] >> 6) & 0 && (registers[16] >> 7) & 1)) 
+      {
+        program_counter = program_counter + instr.immediate + 4;
+        isChanged = 1;
+      }
+      break;  
     case call:
       registers[6] = registers[6] - 4;
       memory[registers[6]] = program_counter + 4;      
