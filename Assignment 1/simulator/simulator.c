@@ -72,7 +72,7 @@ int main(int argc, char** argv)
   // Optionally print the decoded instructions for debugging
   // Will not work until you implement decode_instructions
   // Do not call this function in your submitted final version
-  // print_instructions(instructions, num_instructions);
+  //print_instructions(instructions, num_instructions);
 
 
   // Once you have completed Part 1 (decoding instructions), uncomment the below block
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
   {
     if(i == 6)
     {
-      registers[i] = 0x0200;
+      registers[i] = 0x0400;
     }
     else
     {
@@ -168,8 +168,10 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
     case movl_deref_reg:
       if(memory[registers[instr.first_register] + instr.immediate + 1] != 0)
       {
-        registers[instr.second_register] |= memory[registers[instr.first_register] + instr.immediate] <<  8;
-        registers[instr.second_register] |= memory[registers[instr.first_register] + instr.immediate + 1];
+        registers[instr.second_register] |= memory[registers[instr.first_register] + instr.immediate + 3] <<  24;
+        registers[instr.second_register] |= memory[registers[instr.first_register] + instr.immediate + 2] <<  16;
+        registers[instr.second_register] |= memory[registers[instr.first_register] + instr.immediate + 1] <<  8;
+        registers[instr.second_register] |= memory[registers[instr.first_register] + instr.immediate];
       }
       else
       {
@@ -179,8 +181,10 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
     case movl_reg_deref:
       if(registers[instr.first_register] > 255)
       {
-        memory[registers[instr.second_register] + instr.immediate] = (registers[instr.first_register] & 0xff00) >>  8;
-        memory[registers[instr.second_register] + instr.immediate + 1] = (registers[instr.first_register] & 0x00ff);
+        memory[registers[instr.second_register] + instr.immediate + 3] = (registers[instr.first_register] & 0xff000000) >>  24;
+        memory[registers[instr.second_register] + instr.immediate + 2] = (registers[instr.first_register] & 0x00ff0000) >>  16;
+        memory[registers[instr.second_register] + instr.immediate + 1] = (registers[instr.first_register] & 0x0000ff00) >>  8;
+        memory[registers[instr.second_register] + instr.immediate] = (registers[instr.first_register] & 0x000000ff);
       }
       else
       {
@@ -208,6 +212,14 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
     case jmp:
       program_counter = program_counter + instr.immediate + 4;
       isChanged = 1;
+      break;
+    case pushl:
+      registers[6] = registers[6] - 4;
+      memory[registers[6]] = registers[instr.first_register];
+      break;
+    case popl:
+      registers[instr.first_register] = memory[registers[6]];
+      registers[6] = registers[6] + 4;
       break;
     case printr:
       printf("%d (0x%x)\n", registers[instr.first_register], registers[instr.first_register]);
