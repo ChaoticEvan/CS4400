@@ -93,9 +93,9 @@ int main(int argc, char** argv)
 
   // Stack memory is byte-addressed, so it must be a 1-byte type
   // TODO allocate the stack memory. Do not assign to NULL.
-  unsigned char* memory = malloc(1024);
+  unsigned char* memory = malloc(4096);
   unsigned int j;
-  for(j = 0; j < 1024; ++j)
+  for(j = 0; j < 4096; ++j)
   {
     memory[i] = 0x0;
   }
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
   // to get the address past the last instruction
   while(program_counter != num_instructions * 4)
   {
-    program_counter = execute_instruction(program_counter, instructions, registers, memory);
+    program_counter = execute_instruction(program_counter, instructions, registers, memory);    
   }  
   
   return 0;
@@ -213,6 +213,29 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
       program_counter = program_counter + instr.immediate + 4;
       isChanged = 1;
       break;
+    case call:
+      registers[6] = registers[6] - 4;
+      memory[registers[6]] = program_counter + 4;      
+      program_counter = program_counter + instr.immediate + 4;
+      isChanged = 1;
+      break;
+    case ret:
+      if(registers[6] == 1024)
+      {
+        exit(0);
+      }
+      else
+      {
+        program_counter = memory[registers[6]];
+        registers[6] = registers[6] + 4;
+        isChanged = 1;
+      }
+      
+      // if %esp == 1024, exit simulation
+      // else
+      // program_counter = memory[%esp]
+      // %esp = %esp + 4
+      break;    
     case pushl:
       registers[6] = registers[6] - 4;
       memory[registers[6]] = registers[instr.first_register];

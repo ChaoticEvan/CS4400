@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/simulator",
             "args": [
-                "tests/moderate/pushpop.o"
+                "tests/moderate/callret.o"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
