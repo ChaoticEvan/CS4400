@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/simulator",
             "args": [
-                "tests/moderate/movl_deref.o"
+                "tests/simple/shrl.o"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

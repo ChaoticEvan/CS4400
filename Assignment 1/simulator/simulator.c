@@ -72,7 +72,7 @@ int main(int argc, char** argv)
   // Optionally print the decoded instructions for debugging
   // Will not work until you implement decode_instructions
   // Do not call this function in your submitted final version
-  //print_instructions(instructions, num_instructions);
+  // print_instructions(instructions, num_instructions);
 
 
   // Once you have completed Part 1 (decoding instructions), uncomment the below block
@@ -160,7 +160,7 @@ unsigned int execute_instruction(unsigned int program_counter, instruction_t* in
       registers[instr.second_register] = registers[instr.first_register] * registers[instr.second_register];
       break;
     case shrl: ;
-      registers[instr.first_register] = registers[instr.first_register] >> 1;;
+      registers[instr.first_register] = (unsigned int) registers[instr.first_register] >> 1;
       break;
     case movl_reg_reg:
       registers[instr.second_register] = registers[instr.first_register];
