@@ -49,300 +49,300 @@ void naive_complex(int dim, pixel *src, pixel *dest)
     }
 }
 
-char complex_unrollJ2_descr[] = "complex_unrollJ2: Unroll j+=2";
-void complex_unrollJ2(int dim, pixel *src, pixel *dest)
-{
-  int i, j;
+// char complex_unrollJ2_descr[] = "complex_unrollJ2: Unroll j+=2";
+// void complex_unrollJ2(int dim, pixel *src, pixel *dest)
+// {
+//   int i, j;
 
-  for(i = 0; i < dim; i++)
-    for(j = 0; j < dim; j+=2)
-    {
-      dest[RIDX(dim - j - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, j, dim)].red +
-							(int)src[RIDX(i, j, dim)].green +
-							(int)src[RIDX(i, j, dim)].blue) / 3;
+//   for(i = 0; i < dim; i++)
+//     for(j = 0; j < dim; j+=2)
+//     {
+//       dest[RIDX(dim - j - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, j, dim)].red +
+// 							(int)src[RIDX(i, j, dim)].green +
+// 							(int)src[RIDX(i, j, dim)].blue) / 3;
       
-      dest[RIDX(dim - j - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, j, dim)].red +
-							(int)src[RIDX(i, j, dim)].green +
-							(int)src[RIDX(i, j, dim)].blue) / 3;
+//       dest[RIDX(dim - j - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, j, dim)].red +
+// 							(int)src[RIDX(i, j, dim)].green +
+// 							(int)src[RIDX(i, j, dim)].blue) / 3;
       
-      dest[RIDX(dim - j - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, j, dim)].red +
-							(int)src[RIDX(i, j, dim)].green +
-							(int)src[RIDX(i, j, dim)].blue) / 3;
+//       dest[RIDX(dim - j - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, j, dim)].red +
+// 							(int)src[RIDX(i, j, dim)].green +
+// 							(int)src[RIDX(i, j, dim)].blue) / 3;
 
 
-      // Second half of unroll
-      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, (j+1), dim)].red +
-						      (int)src[RIDX(i, (j+1), dim)].green +
-						      (int)src[RIDX(i, (j+1), dim)].blue) / 3;
+//       // Second half of unroll
+//       dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, (j+1), dim)].red +
+// 						      (int)src[RIDX(i, (j+1), dim)].green +
+// 						      (int)src[RIDX(i, (j+1), dim)].blue) / 3;
       
-      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, (j+1), dim)].red +
-							(int)src[RIDX(i, (j+1), dim)].green +
-							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
+//       dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, (j+1), dim)].red +
+// 							(int)src[RIDX(i, (j+1), dim)].green +
+// 							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
       
-      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, (j+1), dim)].red +
-							(int)src[RIDX(i, (j+1), dim)].green +
-							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
-    }
-}
+//       dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, (j+1), dim)].red +
+// 							(int)src[RIDX(i, (j+1), dim)].green +
+// 							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
+//     }
+// }
 
-char complex_unrollI2_descr[] = "complex_unrollI2: Unroll i+=2";
-void complex_unrollI2(int dim, pixel *src, pixel *dest)
-{
-  int i, j;
+// char complex_unrollI2_descr[] = "complex_unrollI2: Unroll i+=2";
+// void complex_unrollI2(int dim, pixel *src, pixel *dest)
+// {
+//   int i, j;
 
-  for(i = 0; i < dim; i+=2)
-	{
-    for(j = 0; j < dim; j++)
-    {
-      dest[RIDX(dim - j - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, j, dim)].red +
-							(int)src[RIDX(i, j, dim)].green +
-							(int)src[RIDX(i, j, dim)].blue) / 3;
+//   for(i = 0; i < dim; i+=2)
+// 	{
+//     for(j = 0; j < dim; j++)
+//     {
+//       dest[RIDX(dim - j - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, j, dim)].red +
+// 							(int)src[RIDX(i, j, dim)].green +
+// 							(int)src[RIDX(i, j, dim)].blue) / 3;
       
-      dest[RIDX(dim - j - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, j, dim)].red +
-							(int)src[RIDX(i, j, dim)].green +
-							(int)src[RIDX(i, j, dim)].blue) / 3;
+//       dest[RIDX(dim - j - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, j, dim)].red +
+// 							(int)src[RIDX(i, j, dim)].green +
+// 							(int)src[RIDX(i, j, dim)].blue) / 3;
       
-      dest[RIDX(dim - j - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, j, dim)].red +
-							(int)src[RIDX(i, j, dim)].green +
-							(int)src[RIDX(i, j, dim)].blue) / 3;
+//       dest[RIDX(dim - j - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, j, dim)].red +
+// 							(int)src[RIDX(i, j, dim)].green +
+// 							(int)src[RIDX(i, j, dim)].blue) / 3;
 
 
-      // Second half of unroll
-      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].red = ((int)src[RIDX((i+1), j, dim)].red +
-						      (int)src[RIDX((i+1), j, dim)].green +
-						      (int)src[RIDX((i+1), j, dim)].blue) / 3;
+//       // Second half of unroll
+//       dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].red = ((int)src[RIDX((i+1), j, dim)].red +
+// 						      (int)src[RIDX((i+1), j, dim)].green +
+// 						      (int)src[RIDX((i+1), j, dim)].blue) / 3;
       
-      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].green = ((int)src[RIDX((i+1), j, dim)].red +
-							(int)src[RIDX((i+1), j, dim)].green +
-							(int)src[RIDX((i+1), j, dim)].blue) / 3;
+//       dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].green = ((int)src[RIDX((i+1), j, dim)].red +
+// 							(int)src[RIDX((i+1), j, dim)].green +
+// 							(int)src[RIDX((i+1), j, dim)].blue) / 3;
       
-      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].blue = ((int)src[RIDX((i+1), j, dim)].red +
-							(int)src[RIDX((i+1), j, dim)].green +
-							(int)src[RIDX((i+1), j, dim)].blue) / 3;
-    }
-	}
-}
+//       dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].blue = ((int)src[RIDX((i+1), j, dim)].red +
+// 							(int)src[RIDX((i+1), j, dim)].green +
+// 							(int)src[RIDX((i+1), j, dim)].blue) / 3;
+//     }
+// 	}
+// }
 
-char complex_unrollJ2I2_descr[] = "complex_unrollJ2I2: Unroll i+=2 j+=2";
-void complex_unrollJ2I2(int dim, pixel *src, pixel *dest)
-{
-  int i, j;
+// char complex_unrollJ2I2_descr[] = "complex_unrollJ2I2: Unroll i+=2 j+=2";
+// void complex_unrollJ2I2(int dim, pixel *src, pixel *dest)
+// {
+//   int i, j;
 
-  for(i = 0; i < dim; i+=2)
-	{
-    for(j = 0; j < dim; j+=2)
-    {
-      dest[RIDX(dim - j - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, j, dim)].red +
-							(int)src[RIDX(i, j, dim)].green +
-							(int)src[RIDX(i, j, dim)].blue) / 3;
+//   for(i = 0; i < dim; i+=2)
+// 	{
+//     for(j = 0; j < dim; j+=2)
+//     {
+//       dest[RIDX(dim - j - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, j, dim)].red +
+// 							(int)src[RIDX(i, j, dim)].green +
+// 							(int)src[RIDX(i, j, dim)].blue) / 3;
       
-      dest[RIDX(dim - j - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, j, dim)].red +
-							(int)src[RIDX(i, j, dim)].green +
-							(int)src[RIDX(i, j, dim)].blue) / 3;
+//       dest[RIDX(dim - j - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, j, dim)].red +
+// 							(int)src[RIDX(i, j, dim)].green +
+// 							(int)src[RIDX(i, j, dim)].blue) / 3;
       
-      dest[RIDX(dim - j - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, j, dim)].red +
-							(int)src[RIDX(i, j, dim)].green +
-							(int)src[RIDX(i, j, dim)].blue) / 3;
+//       dest[RIDX(dim - j - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, j, dim)].red +
+// 							(int)src[RIDX(i, j, dim)].green +
+// 							(int)src[RIDX(i, j, dim)].blue) / 3;
 
 
-      // (i+1, j)
-      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].red = ((int)src[RIDX((i+1), j, dim)].red +
-						      (int)src[RIDX((i+1), j, dim)].green +
-						      (int)src[RIDX((i+1), j, dim)].blue) / 3;
+//       // (i+1, j)
+//       dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].red = ((int)src[RIDX((i+1), j, dim)].red +
+// 						      (int)src[RIDX((i+1), j, dim)].green +
+// 						      (int)src[RIDX((i+1), j, dim)].blue) / 3;
       
-      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].green = ((int)src[RIDX((i+1), j, dim)].red +
-							(int)src[RIDX((i+1), j, dim)].green +
-							(int)src[RIDX((i+1), j, dim)].blue) / 3;
+//       dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].green = ((int)src[RIDX((i+1), j, dim)].red +
+// 							(int)src[RIDX((i+1), j, dim)].green +
+// 							(int)src[RIDX((i+1), j, dim)].blue) / 3;
       
-      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].blue = ((int)src[RIDX((i+1), j, dim)].red +
-							(int)src[RIDX((i+1), j, dim)].green +
-							(int)src[RIDX((i+1), j, dim)].blue) / 3;
+//       dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].blue = ((int)src[RIDX((i+1), j, dim)].red +
+// 							(int)src[RIDX((i+1), j, dim)].green +
+// 							(int)src[RIDX((i+1), j, dim)].blue) / 3;
 
-      // (i, j+1)
-      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, (j+1), dim)].red +
-						      (int)src[RIDX(i, (j+1), dim)].green +
-						      (int)src[RIDX(i, (j+1), dim)].blue) / 3;
+//       // (i, j+1)
+//       dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, (j+1), dim)].red +
+// 						      (int)src[RIDX(i, (j+1), dim)].green +
+// 						      (int)src[RIDX(i, (j+1), dim)].blue) / 3;
       
-      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, (j+1), dim)].red +
-							(int)src[RIDX(i, (j+1), dim)].green +
-							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
+//       dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, (j+1), dim)].red +
+// 							(int)src[RIDX(i, (j+1), dim)].green +
+// 							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
       
-      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, (j+1), dim)].red +
-							(int)src[RIDX(i, (j+1), dim)].green +
-							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
+//       dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, (j+1), dim)].red +
+// 							(int)src[RIDX(i, (j+1), dim)].green +
+// 							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
 
-			// (i+1, j+1)
-      dest[RIDX(dim - (j+1) - 1, dim - (i+1) - 1, dim)].red = ((int)src[RIDX((i+1), (j+1), dim)].red +
-						      (int)src[RIDX((i+1), (j+1), dim)].green +
-						      (int)src[RIDX((i+1), (j+1), dim)].blue) / 3;
+// 			// (i+1, j+1)
+//       dest[RIDX(dim - (j+1) - 1, dim - (i+1) - 1, dim)].red = ((int)src[RIDX((i+1), (j+1), dim)].red +
+// 						      (int)src[RIDX((i+1), (j+1), dim)].green +
+// 						      (int)src[RIDX((i+1), (j+1), dim)].blue) / 3;
       
-      dest[RIDX(dim - (j+1) - 1, dim - (i+1) - 1, dim)].green = ((int)src[RIDX((i+1), (j+1), dim)].red +
-							(int)src[RIDX((i+1), (j+1), dim)].green +
-							(int)src[RIDX((i+1), (j+1), dim)].blue) / 3;
+//       dest[RIDX(dim - (j+1) - 1, dim - (i+1) - 1, dim)].green = ((int)src[RIDX((i+1), (j+1), dim)].red +
+// 							(int)src[RIDX((i+1), (j+1), dim)].green +
+// 							(int)src[RIDX((i+1), (j+1), dim)].blue) / 3;
       
-      dest[RIDX(dim - (j+1) - 1, dim - (i+1) - 1, dim)].blue = ((int)src[RIDX((i+1), (j+1), dim)].red +
-							(int)src[RIDX((i+1), (j+1), dim)].green +
-							(int)src[RIDX((i+1), (j+1), dim)].blue) / 3;
-    }
-	}
-}
+//       dest[RIDX(dim - (j+1) - 1, dim - (i+1) - 1, dim)].blue = ((int)src[RIDX((i+1), (j+1), dim)].red +
+// 							(int)src[RIDX((i+1), (j+1), dim)].green +
+// 							(int)src[RIDX((i+1), (j+1), dim)].blue) / 3;
+//     }
+// 	}
+// }
 
-char complex_unrollJ2I2_CSE_descr[] = "complex_unrollJ2I2_CSE: Unroll i+=2 j+=2 w/ CSE";
-void complex_unrollJ2I2_CSE(int dim, pixel *src, pixel *dest)
-{
-  int i, j, dimCalc, srcDimCalc;
+// char complex_unrollJ2I2_CSE_descr[] = "complex_unrollJ2I2_CSE: Unroll i+=2 j+=2 w/ CSE";
+// void complex_unrollJ2I2_CSE(int dim, pixel *src, pixel *dest)
+// {
+//   int i, j, dimCalc, srcDimCalc;
 
-  for(i = 0; i < dim; i+=2)
-	{
-    for(j = 0; j < dim; j+=2)
-    {
-			dimCalc = ((dim - j - 1) * (dim) + (dim - i - 1));
-			srcDimCalc = ((i)*(dim)+(j));
-      dest[dimCalc].red = ((int)src[srcDimCalc].red +
-							(int)src[srcDimCalc].green +
-							(int)src[srcDimCalc].blue) / 3;
+//   for(i = 0; i < dim; i+=2)
+// 	{
+//     for(j = 0; j < dim; j+=2)
+//     {
+// 			dimCalc = ((dim - j - 1) * (dim) + (dim - i - 1));
+// 			srcDimCalc = ((i)*(dim)+(j));
+//       dest[dimCalc].red = ((int)src[srcDimCalc].red +
+// 							(int)src[srcDimCalc].green +
+// 							(int)src[srcDimCalc].blue) / 3;
       
-      dest[dimCalc].green = ((int)src[srcDimCalc].red +
-							(int)src[srcDimCalc].green +
-							(int)src[srcDimCalc].blue) / 3;
+//       dest[dimCalc].green = ((int)src[srcDimCalc].red +
+// 							(int)src[srcDimCalc].green +
+// 							(int)src[srcDimCalc].blue) / 3;
       
-      dest[dimCalc].blue = ((int)src[srcDimCalc].red +
-							(int)src[srcDimCalc].green +
-							(int)src[srcDimCalc].blue) / 3;
+//       dest[dimCalc].blue = ((int)src[srcDimCalc].red +
+// 							(int)src[srcDimCalc].green +
+// 							(int)src[srcDimCalc].blue) / 3;
 
 
-      // (i+1, j)
-      dest[dimCalc - 1].red = ((int)src[srcDimCalc + dim].red +
-						      (int)src[srcDimCalc + dim].green +
-						      (int)src[srcDimCalc + dim].blue) / 3;
+//       // (i+1, j)
+//       dest[dimCalc - 1].red = ((int)src[srcDimCalc + dim].red +
+// 						      (int)src[srcDimCalc + dim].green +
+// 						      (int)src[srcDimCalc + dim].blue) / 3;
       
-      dest[dimCalc - 1].green = ((int)src[srcDimCalc + dim].red +
-							(int)src[srcDimCalc + dim].green +
-							(int)src[srcDimCalc + dim].blue) / 3;
+//       dest[dimCalc - 1].green = ((int)src[srcDimCalc + dim].red +
+// 							(int)src[srcDimCalc + dim].green +
+// 							(int)src[srcDimCalc + dim].blue) / 3;
       
-      dest[dimCalc - 1].blue = ((int)src[srcDimCalc + dim].red +
-							(int)src[srcDimCalc + dim].green +
-							(int)src[srcDimCalc + dim].blue) / 3;
+//       dest[dimCalc - 1].blue = ((int)src[srcDimCalc + dim].red +
+// 							(int)src[srcDimCalc + dim].green +
+// 							(int)src[srcDimCalc + dim].blue) / 3;
 
-      // (i, j+1)
-      dest[dimCalc - dim].red = ((int)src[srcDimCalc + 1].red +
-						      (int)src[srcDimCalc + 1].green +
-						      (int)src[srcDimCalc + 1].blue) / 3;
+//       // (i, j+1)
+//       dest[dimCalc - dim].red = ((int)src[srcDimCalc + 1].red +
+// 						      (int)src[srcDimCalc + 1].green +
+// 						      (int)src[srcDimCalc + 1].blue) / 3;
       
-      dest[dimCalc - dim].green = ((int)src[srcDimCalc + 1].red +
-							(int)src[srcDimCalc + 1].green +
-							(int)src[srcDimCalc + 1].blue) / 3;
+//       dest[dimCalc - dim].green = ((int)src[srcDimCalc + 1].red +
+// 							(int)src[srcDimCalc + 1].green +
+// 							(int)src[srcDimCalc + 1].blue) / 3;
       
-      dest[dimCalc - dim].blue = ((int)src[srcDimCalc + 1].red +
-							(int)src[srcDimCalc + 1].green +
-							(int)src[srcDimCalc + 1].blue) / 3;
+//       dest[dimCalc - dim].blue = ((int)src[srcDimCalc + 1].red +
+// 							(int)src[srcDimCalc + 1].green +
+// 							(int)src[srcDimCalc + 1].blue) / 3;
 
-			// (i+1, j+1)
-      dest[dimCalc - dim - 1].red = ((int)src[srcDimCalc + dim + 1].red +
-						      (int)src[srcDimCalc + dim + 1].green +
-						      (int)src[srcDimCalc + dim + 1].blue) / 3;
+// 			// (i+1, j+1)
+//       dest[dimCalc - dim - 1].red = ((int)src[srcDimCalc + dim + 1].red +
+// 						      (int)src[srcDimCalc + dim + 1].green +
+// 						      (int)src[srcDimCalc + dim + 1].blue) / 3;
       
-      dest[dimCalc - dim - 1].green = ((int)src[srcDimCalc + dim + 1].red +
-							(int)src[srcDimCalc + dim + 1].green +
-							(int)src[srcDimCalc + dim + 1].blue) / 3;
+//       dest[dimCalc - dim - 1].green = ((int)src[srcDimCalc + dim + 1].red +
+// 							(int)src[srcDimCalc + dim + 1].green +
+// 							(int)src[srcDimCalc + dim + 1].blue) / 3;
       
-      dest[dimCalc - dim - 1].blue = ((int)src[srcDimCalc + dim + 1].red +
-							(int)src[srcDimCalc + dim + 1].green +
-							(int)src[srcDimCalc + dim + 1].blue) / 3;
-    }
-	}
-}
+//       dest[dimCalc - dim - 1].blue = ((int)src[srcDimCalc + dim + 1].red +
+// 							(int)src[srcDimCalc + dim + 1].green +
+// 							(int)src[srcDimCalc + dim + 1].blue) / 3;
+//     }
+// 	}
+// }
 
-char complex_unrollJ2I2_CSE2_descr[] = "complex_unrollJ2I2_CSE2: Unroll i+=2 j+=2 w/ CSE #2";
-void complex_unrollJ2I2_CSE2(int dim, pixel *src, pixel *dest)
-{
-  int i, j, dimCalc, srcDimCalc, tempRes;
+// char complex_unrollJ2I2_CSE2_descr[] = "complex_unrollJ2I2_CSE2: Unroll i+=2 j+=2 w/ CSE #2";
+// void complex_unrollJ2I2_CSE2(int dim, pixel *src, pixel *dest)
+// {
+//   int i, j, dimCalc, srcDimCalc, tempRes;
 
-  for(i = 0; i < dim; i+=2)
-	{
-    for(j = 0; j < dim; j+=2)
-    {
-			dimCalc = ((dim - j - 1) * (dim) + (dim - i - 1));
-			srcDimCalc = ((i)*(dim)+(j));
+//   for(i = 0; i < dim; i+=2)
+// 	{
+//     for(j = 0; j < dim; j+=2)
+//     {
+// 			dimCalc = ((dim - j - 1) * (dim) + (dim - i - 1));
+// 			srcDimCalc = ((i)*(dim)+(j));
 
-			tempRes = ((int)src[srcDimCalc].red +
-							(int)src[srcDimCalc].green +
-							(int)src[srcDimCalc].blue) / 3;
-      dest[dimCalc].red = tempRes;      
-      dest[dimCalc].green = tempRes;      
-      dest[dimCalc].blue = tempRes;
+// 			tempRes = ((int)src[srcDimCalc].red +
+// 							(int)src[srcDimCalc].green +
+// 							(int)src[srcDimCalc].blue) / 3;
+//       dest[dimCalc].red = tempRes;      
+//       dest[dimCalc].green = tempRes;      
+//       dest[dimCalc].blue = tempRes;
 
-      // (i+1, j)
-			tempRes = ((int)src[srcDimCalc + dim].red +
-						      (int)src[srcDimCalc + dim].green +
-						      (int)src[srcDimCalc + dim].blue) / 3;
-      dest[dimCalc - 1].red = tempRes;      
-      dest[dimCalc - 1].green = tempRes;      
-      dest[dimCalc - 1].blue = tempRes;
+//       // (i+1, j)
+// 			tempRes = ((int)src[srcDimCalc + dim].red +
+// 						      (int)src[srcDimCalc + dim].green +
+// 						      (int)src[srcDimCalc + dim].blue) / 3;
+//       dest[dimCalc - 1].red = tempRes;      
+//       dest[dimCalc - 1].green = tempRes;      
+//       dest[dimCalc - 1].blue = tempRes;
 
-      // (i, j+1)
-			tempRes = ((int)src[srcDimCalc + 1].red +
-						      (int)src[srcDimCalc + 1].green +
-						      (int)src[srcDimCalc + 1].blue) / 3;
-      dest[dimCalc - dim].red = tempRes;    
-      dest[dimCalc - dim].green = tempRes;      
-      dest[dimCalc - dim].blue = tempRes;
+//       // (i, j+1)
+// 			tempRes = ((int)src[srcDimCalc + 1].red +
+// 						      (int)src[srcDimCalc + 1].green +
+// 						      (int)src[srcDimCalc + 1].blue) / 3;
+//       dest[dimCalc - dim].red = tempRes;    
+//       dest[dimCalc - dim].green = tempRes;      
+//       dest[dimCalc - dim].blue = tempRes;
 
-			// (i+1, j+1)
-			tempRes = ((int)src[srcDimCalc + dim + 1].red +
-						      (int)src[srcDimCalc + dim + 1].green +
-						      (int)src[srcDimCalc + dim + 1].blue) / 3;
-      dest[dimCalc - dim - 1].red = tempRes;      
-      dest[dimCalc - dim - 1].green = tempRes;      
-      dest[dimCalc - dim - 1].blue = tempRes;
-    }
-	}
-}
+// 			// (i+1, j+1)
+// 			tempRes = ((int)src[srcDimCalc + dim + 1].red +
+// 						      (int)src[srcDimCalc + dim + 1].green +
+// 						      (int)src[srcDimCalc + dim + 1].blue) / 3;
+//       dest[dimCalc - dim - 1].red = tempRes;      
+//       dest[dimCalc - dim - 1].green = tempRes;      
+//       dest[dimCalc - dim - 1].blue = tempRes;
+//     }
+// 	}
+// }
 
-char complex_unrollJI4_descr[] = "complex_unrollJI4: Unroll i+=4 j+=4 w/ CSE";
-void complex_unrollJI4(int dim, pixel *src, pixel *dest)
-{
-  int i, j, dimCalc, srcDimCalc, tempRes;
+// char complex_unrollJI4_descr[] = "complex_unrollJI4: Unroll i+=4 j+=4 w/ CSE";
+// void complex_unrollJI4(int dim, pixel *src, pixel *dest)
+// {
+//   int i, j, dimCalc, srcDimCalc, tempRes;
 
-  for(i = 0; i < dim; i+=4)
-	{
-    for(j = 0; j < dim; j++)
-    {
-			dimCalc = ((dim - j - 1) * (dim) + (dim - i - 1));
-			srcDimCalc = ((i)*(dim)+(j));
+//   for(i = 0; i < dim; i+=4)
+// 	{
+//     for(j = 0; j < dim; j++)
+//     {
+// 			dimCalc = ((dim - j - 1) * (dim) + (dim - i - 1));
+// 			srcDimCalc = ((i)*(dim)+(j));
 
-      // (i, j)
-			tempRes = ((int)src[srcDimCalc].red +
-							(int)src[srcDimCalc].green +
-							(int)src[srcDimCalc].blue) / 3;
-      dest[dimCalc].red = tempRes;      
-      dest[dimCalc].green = tempRes;      
-      dest[dimCalc].blue = tempRes;
-      // (i+1, j)
-			tempRes = ((int)src[srcDimCalc + dim].red +
-						      (int)src[srcDimCalc + dim].green +
-						      (int)src[srcDimCalc + dim].blue) / 3;
-      dest[dimCalc - 1].red = tempRes;      
-      dest[dimCalc - 1].green = tempRes;      
-      dest[dimCalc - 1].blue = tempRes;
-			// (i+2, j)
-			tempRes = ((int)src[srcDimCalc + (2*dim)].red +
-						      (int)src[srcDimCalc + (2*dim)].green +
-						      (int)src[srcDimCalc + (2*dim)].blue) / 3;
-      dest[dimCalc - 2].red = tempRes;      
-      dest[dimCalc - 2].green = tempRes;      
-      dest[dimCalc - 2].blue = tempRes;
-			// (i+3, j)
-			tempRes = ((int)src[srcDimCalc + (3*dim)].red +
-						      (int)src[srcDimCalc + (3*dim)].green +
-						      (int)src[srcDimCalc + (3*dim)].blue) / 3;
-      dest[dimCalc - 3].red = tempRes;      
-      dest[dimCalc - 3].green = tempRes;      
-      dest[dimCalc - 3].blue = tempRes;
+//       // (i, j)
+// 			tempRes = ((int)src[srcDimCalc].red +
+// 							(int)src[srcDimCalc].green +
+// 							(int)src[srcDimCalc].blue) / 3;
+//       dest[dimCalc].red = tempRes;      
+//       dest[dimCalc].green = tempRes;      
+//       dest[dimCalc].blue = tempRes;
+//       // (i+1, j)
+// 			tempRes = ((int)src[srcDimCalc + dim].red +
+// 						      (int)src[srcDimCalc + dim].green +
+// 						      (int)src[srcDimCalc + dim].blue) / 3;
+//       dest[dimCalc - 1].red = tempRes;      
+//       dest[dimCalc - 1].green = tempRes;      
+//       dest[dimCalc - 1].blue = tempRes;
+// 			// (i+2, j)
+// 			tempRes = ((int)src[srcDimCalc + (2*dim)].red +
+// 						      (int)src[srcDimCalc + (2*dim)].green +
+// 						      (int)src[srcDimCalc + (2*dim)].blue) / 3;
+//       dest[dimCalc - 2].red = tempRes;      
+//       dest[dimCalc - 2].green = tempRes;      
+//       dest[dimCalc - 2].blue = tempRes;
+// 			// (i+3, j)
+// 			tempRes = ((int)src[srcDimCalc + (3*dim)].red +
+// 						      (int)src[srcDimCalc + (3*dim)].green +
+// 						      (int)src[srcDimCalc + (3*dim)].blue) / 3;
+//       dest[dimCalc - 3].red = tempRes;      
+//       dest[dimCalc - 3].green = tempRes;      
+//       dest[dimCalc - 3].blue = tempRes;
 
-    }
-	}
-}
+//     }
+// 	}
+// }
 
 /* 
  * complex - Your current working version of complex
