@@ -10,8 +10,8 @@
  * Please fill in the following student struct 
  */
 student_t student = {
-  "Harry Q. Bovik",     /* Full name */
-  "no_one@nowhere.edu",  /* Email address */
+  "Evan W. Voordeckers",     /* Full name */
+  "evan.voordeckers@yahoo.com",  /* Email address */
 };
 
 /***************
@@ -49,6 +49,143 @@ void naive_complex(int dim, pixel *src, pixel *dest)
     }
 }
 
+char complex_unrollJ2_descr[] = "complex_unrollJ2: Unroll j+=2";
+void complex_unrollJ2(int dim, pixel *src, pixel *dest)
+{
+  int i, j;
+
+  for(i = 0; i < dim; i++)
+    for(j = 0; j < dim; j+=2)
+    {
+      dest[RIDX(dim - j - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, j, dim)].red +
+							(int)src[RIDX(i, j, dim)].green +
+							(int)src[RIDX(i, j, dim)].blue) / 3;
+      
+      dest[RIDX(dim - j - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, j, dim)].red +
+							(int)src[RIDX(i, j, dim)].green +
+							(int)src[RIDX(i, j, dim)].blue) / 3;
+      
+      dest[RIDX(dim - j - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, j, dim)].red +
+							(int)src[RIDX(i, j, dim)].green +
+							(int)src[RIDX(i, j, dim)].blue) / 3;
+
+
+      // Second half of unroll
+      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, (j+1), dim)].red +
+						      (int)src[RIDX(i, (j+1), dim)].green +
+						      (int)src[RIDX(i, (j+1), dim)].blue) / 3;
+      
+      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, (j+1), dim)].red +
+							(int)src[RIDX(i, (j+1), dim)].green +
+							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
+      
+      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, (j+1), dim)].red +
+							(int)src[RIDX(i, (j+1), dim)].green +
+							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
+    }
+}
+
+char complex_unrollI2_descr[] = "complex_unrollI2: Unroll i+=2";
+void complex_unrollI2(int dim, pixel *src, pixel *dest)
+{
+  int i, j;
+
+  for(i = 0; i < dim; i+=2)
+	{
+    for(j = 0; j < dim; j++)
+    {
+      dest[RIDX(dim - j - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, j, dim)].red +
+							(int)src[RIDX(i, j, dim)].green +
+							(int)src[RIDX(i, j, dim)].blue) / 3;
+      
+      dest[RIDX(dim - j - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, j, dim)].red +
+							(int)src[RIDX(i, j, dim)].green +
+							(int)src[RIDX(i, j, dim)].blue) / 3;
+      
+      dest[RIDX(dim - j - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, j, dim)].red +
+							(int)src[RIDX(i, j, dim)].green +
+							(int)src[RIDX(i, j, dim)].blue) / 3;
+
+
+      // Second half of unroll
+      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].red = ((int)src[RIDX((i+1), j, dim)].red +
+						      (int)src[RIDX((i+1), j, dim)].green +
+						      (int)src[RIDX((i+1), j, dim)].blue) / 3;
+      
+      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].green = ((int)src[RIDX((i+1), j, dim)].red +
+							(int)src[RIDX((i+1), j, dim)].green +
+							(int)src[RIDX((i+1), j, dim)].blue) / 3;
+      
+      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].blue = ((int)src[RIDX((i+1), j, dim)].red +
+							(int)src[RIDX((i+1), j, dim)].green +
+							(int)src[RIDX((i+1), j, dim)].blue) / 3;
+    }
+	}
+}
+
+char complex_unrollJ2I2_descr[] = "complex_unrollJ2I2: Unroll i+=2 j+=2";
+void complex_unrollJ2I2(int dim, pixel *src, pixel *dest)
+{
+  int i, j;
+
+  for(i = 0; i < dim; i+=2)
+	{
+    for(j = 0; j < dim; j+=2)
+    {
+      dest[RIDX(dim - j - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, j, dim)].red +
+							(int)src[RIDX(i, j, dim)].green +
+							(int)src[RIDX(i, j, dim)].blue) / 3;
+      
+      dest[RIDX(dim - j - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, j, dim)].red +
+							(int)src[RIDX(i, j, dim)].green +
+							(int)src[RIDX(i, j, dim)].blue) / 3;
+      
+      dest[RIDX(dim - j - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, j, dim)].red +
+							(int)src[RIDX(i, j, dim)].green +
+							(int)src[RIDX(i, j, dim)].blue) / 3;
+
+
+      // (i+1, j)
+      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].red = ((int)src[RIDX((i+1), j, dim)].red +
+						      (int)src[RIDX((i+1), j, dim)].green +
+						      (int)src[RIDX((i+1), j, dim)].blue) / 3;
+      
+      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].green = ((int)src[RIDX((i+1), j, dim)].red +
+							(int)src[RIDX((i+1), j, dim)].green +
+							(int)src[RIDX((i+1), j, dim)].blue) / 3;
+      
+      dest[RIDX(dim - j - 1, dim - (i+1) - 1, dim)].blue = ((int)src[RIDX((i+1), j, dim)].red +
+							(int)src[RIDX((i+1), j, dim)].green +
+							(int)src[RIDX((i+1), j, dim)].blue) / 3;
+
+      // (i, j+1)
+      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].red = ((int)src[RIDX(i, (j+1), dim)].red +
+						      (int)src[RIDX(i, (j+1), dim)].green +
+						      (int)src[RIDX(i, (j+1), dim)].blue) / 3;
+      
+      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].green = ((int)src[RIDX(i, (j+1), dim)].red +
+							(int)src[RIDX(i, (j+1), dim)].green +
+							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
+      
+      dest[RIDX(dim - (j+1) - 1, dim - i - 1, dim)].blue = ((int)src[RIDX(i, (j+1), dim)].red +
+							(int)src[RIDX(i, (j+1), dim)].green +
+							(int)src[RIDX(i, (j+1), dim)].blue) / 3;
+
+			// (i+1, j+1)
+      dest[RIDX(dim - (j+1) - 1, dim - (i+1) - 1, dim)].red = ((int)src[RIDX((i+1), (j+1), dim)].red +
+						      (int)src[RIDX((i+1), (j+1), dim)].green +
+						      (int)src[RIDX((i+1), (j+1), dim)].blue) / 3;
+      
+      dest[RIDX(dim - (j+1) - 1, dim - (i+1) - 1, dim)].green = ((int)src[RIDX((i+1), (j+1), dim)].red +
+							(int)src[RIDX((i+1), (j+1), dim)].green +
+							(int)src[RIDX((i+1), (j+1), dim)].blue) / 3;
+      
+      dest[RIDX(dim - (j+1) - 1, dim - (i+1) - 1, dim)].blue = ((int)src[RIDX((i+1), (j+1), dim)].red +
+							(int)src[RIDX((i+1), (j+1), dim)].green +
+							(int)src[RIDX((i+1), (j+1), dim)].blue) / 3;
+    }
+	}
+}
 
 /* 
  * complex - Your current working version of complex
@@ -57,8 +194,10 @@ void naive_complex(int dim, pixel *src, pixel *dest)
 char complex_descr[] = "complex: Current working version";
 void complex(int dim, pixel *src, pixel *dest)
 {
-  naive_complex(dim, src, dest);
+  complex_unrollJ2I2(dim, src, dest);
 }
+
+
 
 /*********************************************************************
  * register_complex_functions - Register all of your different versions
@@ -71,6 +210,13 @@ void complex(int dim, pixel *src, pixel *dest)
 void register_complex_functions() {
   add_complex_function(&complex, complex_descr);
   add_complex_function(&naive_complex, naive_complex_descr);
+
+	// Removed because complex_unrollJ2I2 did both of these
+  // add_complex_function(&complex_unrollJ2, complex_unrollJ2_descr);
+	// add_complex_function(&complex_unrollI2, complex_unrollI2_descr);
+
+	
+	add_complex_function(&complex_unrollJ2I2, complex_unrollJ2I2_descr);
 }
 
 
