@@ -350,9 +350,48 @@ void complex_unrollJI4(int dim, pixel *src, pixel *dest)
  */
 char complex_descr[] = "complex: Current working version";
 void complex(int dim, pixel *src, pixel *dest)
-{
-  complex_unrollJI4(dim, src, dest);
-}
+	{
+		int i, j, dimCalc, srcDimCalc, tempRes;
+
+		for(i = 0; i < dim; i+=4)
+		{
+			for(j = 0; j < dim; j++)
+			{
+				dimCalc = ((dim - j - 1) * (dim) + (dim - i - 1));
+				srcDimCalc = ((i)*(dim)+(j));
+
+				// (i, j)
+				tempRes = ((int)src[srcDimCalc].red +
+								(int)src[srcDimCalc].green +
+								(int)src[srcDimCalc].blue) / 3;
+				dest[dimCalc].red = tempRes;      
+				dest[dimCalc].green = tempRes;      
+				dest[dimCalc].blue = tempRes;
+				// (i+1, j)
+				tempRes = ((int)src[srcDimCalc + dim].red +
+										(int)src[srcDimCalc + dim].green +
+										(int)src[srcDimCalc + dim].blue) / 3;
+				dest[dimCalc - 1].red = tempRes;      
+				dest[dimCalc - 1].green = tempRes;      
+				dest[dimCalc - 1].blue = tempRes;
+				// (i+2, j)
+				tempRes = ((int)src[srcDimCalc + (2*dim)].red +
+										(int)src[srcDimCalc + (2*dim)].green +
+										(int)src[srcDimCalc + (2*dim)].blue) / 3;
+				dest[dimCalc - 2].red = tempRes;      
+				dest[dimCalc - 2].green = tempRes;      
+				dest[dimCalc - 2].blue = tempRes;
+				// (i+3, j)
+				tempRes = ((int)src[srcDimCalc + (3*dim)].red +
+										(int)src[srcDimCalc + (3*dim)].green +
+										(int)src[srcDimCalc + (3*dim)].blue) / 3;
+				dest[dimCalc - 3].red = tempRes;      
+				dest[dimCalc - 3].green = tempRes;      
+				dest[dimCalc - 3].blue = tempRes;
+
+			}
+		}
+	}
 
 
 
@@ -376,9 +415,11 @@ void register_complex_functions() {
 	//add_complex_function(&complex_unrollJ2I2, complex_unrollJ2I2_descr);
 	//add_complex_function(&complex_unrollJ2I2_CSE, complex_unrollJ2I2_CSE_descr);
 
-	add_complex_function(&complex_unrollJ2I2_CSE2, complex_unrollJ2I2_CSE2_descr);
+	// Unrolling the loop to j+=4 is giving me an average of 1.7-1.8 on CADE Lab1-27
+	//add_complex_function(&complex_unrollJ2I2_CSE2, complex_unrollJ2I2_CSE2_descr);
 
-	add_complex_function(&complex_unrollJI4, complex_unrollJI4_descr);
+	// This is method is duplicated in complex()
+	//add_complex_function(&complex_unrollJI4, complex_unrollJI4_descr);
 }
 
 
