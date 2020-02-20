@@ -449,10 +449,10 @@ static pixel weighted_combo(int dim, int i, int j, pixel *src)
     for(jj=0; jj < 3; jj++) 
       if ((i + ii < dim) && (j + jj < dim)) 
       {
-	num_neighbors++;
-	red += (int) src[RIDX(i+ii,j+jj,dim)].red;
-	green += (int) src[RIDX(i+ii,j+jj,dim)].green;
-	blue += (int) src[RIDX(i+ii,j+jj,dim)].blue;
+		num_neighbors++;
+		red += (int) src[RIDX(i+ii,j+jj,dim)].red;
+		green += (int) src[RIDX(i+ii,j+jj,dim)].green;
+		blue += (int) src[RIDX(i+ii,j+jj,dim)].blue;
       }
   
   current_pixel.red = (unsigned short) (red / num_neighbors);
@@ -482,6 +482,59 @@ void naive_motion(int dim, pixel *src, pixel *dst)
       dst[RIDX(i, j, dim)] = weighted_combo(dim, i, j, src);
 }
 
+char unroll_motion_descr[] = "unroll_motion: Uses unrolling";
+void unroll_motion(int dim, pixel *src, pixel *dst) 
+{
+	int i, j, dimCalc;
+
+	for (i = 0; i < dim; i+=4)
+	{
+		for (j = 0; j < dim; j+=4)
+		{
+			dimCalc = ((i)*(dim)+(j));
+			dst[dimCalc]= weighted_combo(dim, i, j, src);
+			dst[dimCalc + dim]= weighted_combo(dim, i+1, j, src);
+			dst[dimCalc + (2*dim)]= weighted_combo(dim, i+2, j, src);
+			dst[dimCalc + (3*dim)]= weighted_combo(dim, i+3, j, src);
+
+			dst[dimCalc + 1]= weighted_combo(dim, i, j+1, src);
+			dst[dimCalc + dim + 1]= weighted_combo(dim, i+1, j+1, src);
+			dst[dimCalc + (2*dim) + 1]= weighted_combo(dim, i+2, j+1, src);
+			dst[dimCalc + (3*dim) + 1]= weighted_combo(dim, i+3, j+1, src);
+
+			dst[dimCalc + 2]= weighted_combo(dim, i, j+2, src);
+			dst[dimCalc + dim + 2]= weighted_combo(dim, i+1, j+2, src);
+			dst[dimCalc + (2*dim) + 2]= weighted_combo(dim, i+2, j+2, src);
+			dst[dimCalc + (3*dim) + 2]= weighted_combo(dim, i+3, j+2, src);
+
+			dst[dimCalc + 3]= weighted_combo(dim, i, j+3, src);
+			dst[dimCalc + dim + 3]= weighted_combo(dim, i+1, j+3, src);
+			dst[dimCalc + (2*dim) + 3]= weighted_combo(dim, i+2, j+3, src);
+			dst[dimCalc + (3*dim) + 3]= weighted_combo(dim, i+3, j+3, src);
+		}
+	}
+}
+
+char lecture_motion_descr[] = "lecture_motion: Uses process described in lecture";
+void lecture_motion(int dim, pixel *src, pixel *dst) 
+{
+	int i, j, k, l;
+
+    for(i = 0; i < dim; i+=32)
+	{
+		for(j = 0; j < dim; j+=32)
+		{
+			for(k = i; k < i + 32; k++)
+			{
+				for(l = j; l < j + 32; l++)
+				{
+      				dst[RIDX(k, l, dim)] = weighted_combo(dim, k, l, src);
+				}
+			}
+		}
+	}
+}
+
 
 /*
  * motion - Your current working version of motion. 
@@ -490,7 +543,7 @@ void naive_motion(int dim, pixel *src, pixel *dst)
 char motion_descr[] = "motion: Current working version";
 void motion(int dim, pixel *src, pixel *dst) 
 {
-  naive_motion(dim, src, dst);
+  unroll_motion(dim, src, dst);
 }
 
 /********************************************************************* 
@@ -502,6 +555,11 @@ void motion(int dim, pixel *src, pixel *dst)
  *********************************************************************/
 
 void register_motion_functions() {
-  add_motion_function(&motion, motion_descr);
-  add_motion_function(&naive_motion, naive_motion_descr);
+	add_motion_function(&motion, motion_descr);
+	add_motion_function(&naive_motion, naive_motion_descr);
+	
+	// Unrolling didn't seem to help that much
+	add_motion_function(&unroll_motion, unroll_motion_descr);
+
+	add_motion_function(&lecture_motion, lecture_motion_descr);
 }
