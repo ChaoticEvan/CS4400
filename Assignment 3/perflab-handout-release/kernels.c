@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "defs.h"
 
 /* 
@@ -432,6 +433,11 @@ void register_complex_functions() {
  * You may modify these or add new ones any way you like.
  **************************************************************/
 
+typedef struct{
+  int red;
+  int green;
+  int blue;
+}AvgPixel;
 
 /* 
  * weighted_combo - Returns new pixel value at (i,j) 
@@ -462,8 +468,6 @@ static pixel weighted_combo(int dim, int i, int j, pixel *src)
   return current_pixel;
 }
 
-
-
 /******************************************************
  * Your different versions of the motion kernel go here
  ******************************************************/
@@ -482,59 +486,198 @@ void naive_motion(int dim, pixel *src, pixel *dst)
       dst[RIDX(i, j, dim)] = weighted_combo(dim, i, j, src);
 }
 
-char unroll_motion_descr[] = "unroll_motion: Uses unrolling";
-void unroll_motion(int dim, pixel *src, pixel *dst) 
+
+
+// char unroll_motion_descr[] = "unroll_motion: Uses unrolling";
+// void unroll_motion(int dim, pixel *src, pixel *dst) 
+// {
+// 	int i, j, dimCalc;
+
+// 	for (i = 0; i < dim; i+=4)
+// 	{
+// 		for (j = 0; j < dim; j+=8)
+// 		{
+// 			dimCalc = ((i)*(dim)+(j));
+// 			dst[dimCalc]= weighted_combo(dim, i, j, src);
+// 			dst[dimCalc + dim]= weighted_combo(dim, i+1, j, src);
+// 			dst[dimCalc + (2*dim)]= weighted_combo(dim, i+2, j, src);
+// 			dst[dimCalc + (3*dim)]= weighted_combo(dim, i+3, j, src);
+
+// 			dst[dimCalc + 1]= weighted_combo(dim, i, j+1, src);
+// 			dst[dimCalc + dim + 1]= weighted_combo(dim, i+1, j+1, src);
+// 			dst[dimCalc + (2*dim) + 1]= weighted_combo(dim, i+2, j+1, src);
+// 			dst[dimCalc + (3*dim) + 1]= weighted_combo(dim, i+3, j+1, src);
+
+// 			dst[dimCalc + 2]= weighted_combo(dim, i, j+2, src);
+// 			dst[dimCalc + dim + 2]= weighted_combo(dim, i+1, j+2, src);
+// 			dst[dimCalc + (2*dim) + 2]= weighted_combo(dim, i+2, j+2, src);
+// 			dst[dimCalc + (3*dim) + 2]= weighted_combo(dim, i+3, j+2, src);
+
+// 			dst[dimCalc + 3]= weighted_combo(dim, i, j+4, src);
+// 			dst[dimCalc + dim + 3]= weighted_combo(dim, i+1, j+4, src);
+// 			dst[dimCalc + (2*dim) + 3]= weighted_combo(dim, i+2, j+4, src);
+// 			dst[dimCalc + (3*dim) + 3]= weighted_combo(dim, i+3, j+4, src);
+
+// 			dst[dimCalc + 3]= weighted_combo(dim, i, j+5, src);
+// 			dst[dimCalc + dim + 3]= weighted_combo(dim, i+1, j+5, src);
+// 			dst[dimCalc + (2*dim) + 3]= weighted_combo(dim, i+2, j+5, src);
+// 			dst[dimCalc + (3*dim) + 3]= weighted_combo(dim, i+3, j+5, src);
+
+// 			dst[dimCalc + 3]= weighted_combo(dim, i, j+6, src);
+// 			dst[dimCalc + dim + 3]= weighted_combo(dim, i+1, j+6, src);
+// 			dst[dimCalc + (2*dim) + 3]= weighted_combo(dim, i+2, j+6, src);
+// 			dst[dimCalc + (3*dim) + 3]= weighted_combo(dim, i+3, j+6, src);
+
+// 			dst[dimCalc + 3]= weighted_combo(dim, i, j+7, src);
+// 			dst[dimCalc + dim + 3]= weighted_combo(dim, i+1, j+7, src);
+// 			dst[dimCalc + (2*dim) + 3]= weighted_combo(dim, i+2, j+7, src);
+// 			dst[dimCalc + (3*dim) + 3]= weighted_combo(dim, i+3, j+7, src);					
+// 		}
+// 	}
+// }
+
+char lab_motion_descr[] = "lab_motion: Uses process from lab";
+__attribute__((always_inline)) void lab_motion(int dim, pixel *src, pixel *dst) 
 {
-	int i, j, dimCalc;
+  int i,j;
+  AvgPixel AvgPixels[3];
+  AvgPixel tempAvgPixel;
+  pixel tempPixel1, tempPixel2, tempPixel3, tempPixel4;  
+  int upper_limit = pow(dim, 2);
+  int currIdx = 0;
 
-	for (i = 0; i < dim; i+=4)
-	{
-		for (j = 0; j < dim; j+=4)
-		{
-			dimCalc = ((i)*(dim)+(j));
-			dst[dimCalc]= weighted_combo(dim, i, j, src);
-			dst[dimCalc + dim]= weighted_combo(dim, i+1, j, src);
-			dst[dimCalc + (2*dim)]= weighted_combo(dim, i+2, j, src);
-			dst[dimCalc + (3*dim)]= weighted_combo(dim, i+3, j, src);
+  // Loop does everything except the last two rows
+  for(i = 0; i < dim - 2; i++)
+  {
+    // Loops over the first row of neighbors for the 
+    // current pixel at (i,j)
+    for(j = 1; j < 3; j++)
+    {
+      tempPixel2 = src[currIdx + j  - 1];
+      tempPixel3 = src[currIdx + dim + j - 1];
+      tempPixel4 = src[currIdx + (2*dim) + j - 1];
 
-			dst[dimCalc + 1]= weighted_combo(dim, i, j+1, src);
-			dst[dimCalc + dim + 1]= weighted_combo(dim, i+1, j+1, src);
-			dst[dimCalc + (2*dim) + 1]= weighted_combo(dim, i+2, j+1, src);
-			dst[dimCalc + (3*dim) + 1]= weighted_combo(dim, i+3, j+1, src);
+      // Add all of these neighbors RGB values to be averaged later
+      tempAvgPixel.red = tempPixel2.red + tempPixel3.red + tempPixel4.red;
+      tempAvgPixel.green = tempPixel2.green + tempPixel3.green + tempPixel4.green;
+      tempAvgPixel.blue = tempPixel2.blue + tempPixel3.blue + tempPixel4.blue;
 
-			dst[dimCalc + 2]= weighted_combo(dim, i, j+2, src);
-			dst[dimCalc + dim + 2]= weighted_combo(dim, i+1, j+2, src);
-			dst[dimCalc + (2*dim) + 2]= weighted_combo(dim, i+2, j+2, src);
-			dst[dimCalc + (3*dim) + 2]= weighted_combo(dim, i+3, j+2, src);
+      AvgPixels[j] = tempAvgPixel;
+    }
+    for(j = 0; j < dim - 2; j++)
+    {
+      AvgPixels[0] = AvgPixels[1];
+      AvgPixels[1] = AvgPixels[2];
 
-			dst[dimCalc + 3]= weighted_combo(dim, i, j+3, src);
-			dst[dimCalc + dim + 3]= weighted_combo(dim, i+1, j+3, src);
-			dst[dimCalc + (2*dim) + 3]= weighted_combo(dim, i+2, j+3, src);
-			dst[dimCalc + (3*dim) + 3]= weighted_combo(dim, i+3, j+3, src);
-		}
-	}
+      tempPixel2 = src[currIdx + j + 2];
+      tempPixel3 = src[currIdx + dim + j + 2];
+      tempPixel4 = src[currIdx + (2*dim) + j + 2];
+
+      tempAvgPixel.red = tempPixel2.red + tempPixel3.red + tempPixel4.red;
+      tempAvgPixel.green = tempPixel2.green + tempPixel3.green + tempPixel4.green;
+      tempAvgPixel.blue = tempPixel2.blue + tempPixel3.blue + tempPixel4.blue;
+      AvgPixels[2] = tempAvgPixel;
+
+      // Get the averaged values from all neighbors
+      tempPixel1.red = (AvgPixels[0].red + AvgPixels[1].red + AvgPixels[2].red)/9;
+      tempPixel1.green = (AvgPixels[0].green + AvgPixels[1].green + AvgPixels[2].green)/9;
+      tempPixel1.blue = (AvgPixels[0].blue + AvgPixels[1].blue + AvgPixels[2].blue)/9;
+
+      dst[currIdx + j] = tempPixel1;
+    }
+
+    // Set the last two columns
+    tempPixel1.red = (AvgPixels[1].red + AvgPixels[2].red)/6;
+    tempPixel1.green = (AvgPixels[1].green + AvgPixels[2].green)/6;
+    tempPixel1.blue = (AvgPixels[1].blue + AvgPixels[2].blue)/6;
+    dst[currIdx + dim - 2] = tempPixel1;
+
+    tempPixel1.red = AvgPixels[2].red/3;
+    tempPixel1.green = AvgPixels[2].green/3;
+    tempPixel1.blue = AvgPixels[2].blue/3;
+    dst[currIdx + dim - 1] = tempPixel1;
+
+    currIdx += dim;
+  }
+
+
+  for(j = 1; j < 3; j++)
+  {
+    tempPixel2 = src[upper_limit - (2*dim) + j - 1];
+    tempPixel3 = src[upper_limit - dim + j - 1];
+
+    tempAvgPixel.red = tempPixel2.red + tempPixel3.red;
+    tempAvgPixel.green = tempPixel2.green + tempPixel3.green;
+    tempAvgPixel.blue = tempPixel2.blue + tempPixel3.blue;
+    AvgPixels[j] = tempAvgPixel;
+  }
+  for(j = 0; j < dim - 2; j++)
+  {
+    AvgPixels[0] = AvgPixels[1];
+    AvgPixels[1] = AvgPixels[2];
+
+    tempPixel2 = src[upper_limit - (2*dim) + j + 2];
+    tempPixel3 = src[upper_limit - dim + j + 2];
+
+    tempAvgPixel.red = tempPixel2.red + tempPixel3.red;
+    tempAvgPixel.green = tempPixel2.green + tempPixel3.green;
+    tempAvgPixel.blue = tempPixel2.blue + tempPixel3.blue;
+    AvgPixels[2] = tempAvgPixel;
+
+    tempPixel1.red = (AvgPixels[0].red + AvgPixels[1].red + AvgPixels[2].red)/6;
+    tempPixel1.green = (AvgPixels[0].green + AvgPixels[1].green + AvgPixels[2].green)/6;
+    tempPixel1.blue = (AvgPixels[0].blue + AvgPixels[1].blue + AvgPixels[2].blue)/6;
+    dst[upper_limit - (2*dim) + j] = tempPixel1;
+  }
+  // Hardcoded # of neighbors because we know where these are located
+  tempPixel1.red = (AvgPixels[1].red + AvgPixels[2].red)/4;
+  tempPixel1.green = (AvgPixels[1].green + AvgPixels[2].green)/4;
+  tempPixel1.blue = (AvgPixels[1].blue + AvgPixels[2].blue)/4;
+  dst[upper_limit - dim - 2] = tempPixel1;
+
+  tempPixel1.red = AvgPixels[2].red/2;
+  tempPixel1.green = AvgPixels[2].green/2;
+  tempPixel1.blue = AvgPixels[2].blue/2;
+  dst[upper_limit - dim - 1] = tempPixel1;
+
+  // Covers last row up to the the very last two pixels in its row
+  for(j = 1; j < 3; j++)
+  {
+    tempPixel2 = src[upper_limit - dim + j - 1];
+    tempAvgPixel.red = tempPixel2.red;
+    tempAvgPixel.blue = tempPixel2.blue;
+    tempAvgPixel.green = tempPixel2.green;
+    AvgPixels[j] = tempAvgPixel;
+  }
+  for(j = 0; j < dim - 2; j++)
+  {
+    AvgPixels[0] = AvgPixels[1];
+    AvgPixels[1] = AvgPixels[2];
+
+    tempPixel3 = src[upper_limit - dim + j + 2];
+
+    tempAvgPixel.red = tempPixel3.red;
+    tempAvgPixel.green = tempPixel3.green;
+    tempAvgPixel.blue = tempPixel3.blue;
+    AvgPixels[2] = tempAvgPixel;
+
+    tempPixel1.red = (AvgPixels[0].red + AvgPixels[1].red + AvgPixels[2].red)/3;
+    tempPixel1.green = (AvgPixels[0].green + AvgPixels[1].green + AvgPixels[2].green)/3;
+    tempPixel1.blue = (AvgPixels[0].blue + AvgPixels[1].blue + AvgPixels[2].blue)/3;
+    dst[upper_limit - dim + j] = tempPixel1;
+  }
+
+  // Set the last two pixels  
+  tempPixel1.red = (AvgPixels[1].red + AvgPixels[2].red)/2;
+  tempPixel1.green = (AvgPixels[1].green + AvgPixels[2].green)/2;
+  tempPixel1.blue = (AvgPixels[1].blue + AvgPixels[2].blue)/2;
+  dst[upper_limit - 2] = tempPixel1;
+
+  tempPixel1.red = AvgPixels[2].red;
+  tempPixel1.green = AvgPixels[2].green;
+  tempPixel1.blue = AvgPixels[2].blue;
+  dst[upper_limit - 1] = tempPixel1;
 }
-
-char lecture_motion_descr[] = "lecture_motion: Uses process described in lecture";
-void lecture_motion(int dim, pixel *src, pixel *dst) 
-{
-	int i, j, k, l;
-
-    for(i = 0; i < dim; i+=32)
-	{
-		for(j = 0; j < dim; j+=32)
-		{
-			for(k = i; k < i + 32; k++)
-			{
-				for(l = j; l < j + 32; l++)
-				{
-      				dst[RIDX(k, l, dim)] = weighted_combo(dim, k, l, src);
-				}
-			}
-		}
-	}
-}
-
 
 /*
  * motion - Your current working version of motion. 
@@ -543,7 +686,7 @@ void lecture_motion(int dim, pixel *src, pixel *dst)
 char motion_descr[] = "motion: Current working version";
 void motion(int dim, pixel *src, pixel *dst) 
 {
-  unroll_motion(dim, src, dst);
+  lab_motion(dim, src, dst);
 }
 
 /********************************************************************* 
@@ -554,12 +697,12 @@ void motion(int dim, pixel *src, pixel *dst)
  *     registered test function.  
  *********************************************************************/
 
-void register_motion_functions() {
+void register_motion_functions() 
+{
 	add_motion_function(&motion, motion_descr);
 	add_motion_function(&naive_motion, naive_motion_descr);
 	
 	// Unrolling didn't seem to help that much
-	add_motion_function(&unroll_motion, unroll_motion_descr);
-
-	add_motion_function(&lecture_motion, lecture_motion_descr);
+	//add_motion_function(&unroll_motion, unroll_motion_descr);
+	add_motion_function(&lab_motion, lab_motion_descr);
 }
