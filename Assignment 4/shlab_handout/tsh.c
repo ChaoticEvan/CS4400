@@ -203,6 +203,7 @@ void eval(char *cmdline)
 	char *argv1[MAXARGS]; /* argv for execve() */
 	char *argv2[MAXARGS]; /* argv for second command execve() */
 	int bg;				  /* should the job run in bg or fg? */
+	pid_t pid;
 
 	/* If the line contains two commands, split into two strings */
 	char *cmd2 = strchr(cmdline, '|');
@@ -225,37 +226,41 @@ void eval(char *cmdline)
 	if (cmd2 != NULL)
 		parseline(cmd2, argv2, 2);
 
-	// TODO: Execute the command(s)
-	//       If cmd2 is NULL, then there is only one command
+	char *envp1[1] = {NULL};
+	if (strcmp(argv1[0], "CLOSE") == 0 || strcmp(argv1[0], "quit") == 0)
+	{
+		exit(builtin_cmd(&argv1[0]));
+	}
 
-	char *envp[1] = {NULL};
-	if (strcmp(argv1[0], "CLOSE") == 0)
-	{
-		builtin_cmd(&argv1[0]);
-	}
-	else if (strcmp(argv1[0], "quit") == 0)
-	{
-		exit(0);
-	}
-	else if (execve(argv1[0], argv1, envp) == -1)
+	// Child process runs the not built in command
+	//pid = fork();
+
+	// REMOVE THIS
+	printf("executing: %s\n", argv1[0]);
+	// REMOVE THIS
+
+	if (execve(argv1[0], argv1, envp1) == -1)
 	{
 		printf("unknown command: %s\n", argv1[0]);
 		exit(1);
 	}
 
+	// parent: wait on foreground process to finish
+	// if (!bg)
+	// {
+	// 	int status;
+	// 	waitpid(pid, &status, 0);
+	// }
+
 	// Execute second command
 	if (cmd2 != NULL)
 	{
-		char *envp[1] = {NULL};
-		if (strcmp(argv2[0], "CLOSE") == 0)
+		char *envp2[1] = {NULL};
+		if (strcmp(argv2[0], "CLOSE") == 0 || strcmp(argv2[0], "quit") == 0)
 		{
-			builtin_cmd(&argv1[0]);
+			builtin_cmd(&argv2[0]);
 		}
-		else if (strcmp(argv2[0], "quit") == 0)
-		{
-			exit(0);
-		}
-		if (execve(argv2[0], argv2, envp) == -1)
+		if (execve(argv2[0], argv2, envp2) == -1)
 		{
 			printf("unknown command: %s\n", argv2[0]);
 			exit(1);
@@ -379,6 +384,11 @@ int builtin_cmd(char **argv)
 
 	if (!strcmp(cmd, "&"))
 	{ /* Ignore singleton & */
+		return 1;
+	}
+
+	if (strcmp(cmd, "quit"))
+	{
 		return 1;
 	}
 
