@@ -229,7 +229,11 @@ void eval(char *cmdline)
 	//       If cmd2 is NULL, then there is only one command
 
 	char *envp[1] = {NULL};
-	if (strcmp(argv1[0], "CLOSE") == 0 || strcmp(argv1[0], "quit") == 0)
+	if (strcmp(argv1[0], "CLOSE") == 0)
+	{
+		builtin_cmd(&argv1[0]);
+	}
+	else if (strcmp(argv1[0], "quit") == 0)
 	{
 		exit(0);
 	}
@@ -243,7 +247,11 @@ void eval(char *cmdline)
 	if (cmd2 != NULL)
 	{
 		char *envp[1] = {NULL};
-		if (strcmp(argv2[0], "CLOSE") == 0 || strcmp(argv2[0], "quit") == 0)
+		if (strcmp(argv2[0], "CLOSE") == 0)
+		{
+			builtin_cmd(&argv1[0]);
+		}
+		else if (strcmp(argv2[0], "quit") == 0)
 		{
 			exit(0);
 		}
