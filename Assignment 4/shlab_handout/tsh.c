@@ -226,46 +226,32 @@ void eval(char *cmdline)
 	if (cmd2 != NULL)
 		parseline(cmd2, argv2, 2);
 
-	char *envp1[1] = {NULL};
-	if (strcmp(argv1[0], "CLOSE") == 0 || strcmp(argv1[0], "quit") == 0)
+	addjob(jobs, getpid(), bg, cmdline);
+
+	if (bg)
 	{
-		exit(builtin_cmd(&argv1[0]));
+		do_bg(nextjid - 1);
 	}
-
-	// Child process runs the not built in command
-	//pid = fork();
-
-	// REMOVE THIS
-	printf("executing: %s\n", argv1[0]);
-	// REMOVE THIS
-
-	if (execve(argv1[0], argv1, envp1) == -1)
+	else
 	{
-		printf("unknown command: %s\n", argv1[0]);
-		exit(1);
+		// wait until this is done, then return
+		do_fg(nextjid - 1);
 	}
-
-	// parent: wait on foreground process to finish
-	// if (!bg)
-	// {
-	// 	int status;
-	// 	waitpid(pid, &status, 0);
-	// }
 
 	// Execute second command
-	if (cmd2 != NULL)
-	{
-		char *envp2[1] = {NULL};
-		if (strcmp(argv2[0], "CLOSE") == 0 || strcmp(argv2[0], "quit") == 0)
-		{
-			builtin_cmd(&argv2[0]);
-		}
-		if (execve(argv2[0], argv2, envp2) == -1)
-		{
-			printf("unknown command: %s\n", argv2[0]);
-			exit(1);
-		}
-	}
+	// if (cmd2 != NULL)
+	// {
+	// 	char *envp2[1] = {NULL};
+	// 	if (strcmp(argv2[0], "CLOSE") == 0 || strcmp(argv2[0], "quit") == 0)
+	// 	{
+	// 		exit(builtin_cmd(&argv2[0]));
+	// 	}
+	// 	if (execve(argv2[0], argv2, envp2) == -1)
+	// 	{
+	// 		printf("unknown command: %s\n", argv2[0]);
+	// 		exit(1);
+	// 	}
+	// }
 
 	return;
 }
@@ -400,6 +386,34 @@ int builtin_cmd(char **argv)
  */
 void do_bg(int jid)
 {
+	char *argv1[MAXARGS]; /* argv for execve() */
+	int bg = parseline(jobs[jid].cmdline, argv1, 1);
+
+	if (strcmp(argv1[0], "CLOSE") == 0 || strcmp(argv1[0], "quit") == 0)
+	{
+		exit(builtin_cmd(&argv1[0]));
+	}
+
+	// Child process runs the not built in command
+	pid_t pid = fork();
+
+	if (pid == 0)
+	{
+		char *envp[1] = {NULL};
+		if (execve(argv1[0], argv1, envp) == -1)
+		{
+			printf("unknown command: %s\n", argv1[0]);
+			exit(1);
+		}
+	}
+
+	// parent: wait on foreground process to finish
+	if (!bg)
+	{
+		int status;
+		waitpid(pid, &status, 0);
+	}
+
 	return;
 }
 
@@ -408,6 +422,22 @@ void do_bg(int jid)
  */
 void do_fg(int jid)
 {
+	char *argv1[MAXARGS]; /* argv for execve() */
+	int bg = parseline(jobs[jid].cmdline, argv1, 1);
+
+	if (strcmp(argv1[0], "CLOSE") == 0 || strcmp(argv1[0], "quit") == 0)
+	{
+		exit(builtin_cmd(&argv1[0]));
+	}
+
+	// Child process runs the not built in command
+	char *envp[1] = {NULL};
+	if (execve(argv1[0], argv1, envp) == -1)
+	{
+		printf("unknown command: %s\n", argv1[0]);
+		exit(1);
+	}
+
 	return;
 }
 
