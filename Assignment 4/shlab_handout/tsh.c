@@ -234,7 +234,6 @@ void eval(char *cmdline)
 	sigaddset(&sigSet, SIGCHLD);
 
 	isBuiltInCmd = builtin_cmd(&argv1[0]);
-
 	if (isBuiltInCmd == 0)
 	{
 		sigprocmask(SIG_BLOCK, &sigSet, NULL);
@@ -389,6 +388,12 @@ int builtin_cmd(char **argv)
 	if (strcmp(cmd, "quit") == 0)
 	{
 		exit(0);
+	}
+
+	if (strcmp(cmd, "jobs") == 0)
+	{
+		listjobs(jobs);
+		return 1;
 	}
 
 	return 0; /* not a builtin command */
