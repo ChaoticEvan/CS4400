@@ -114,6 +114,7 @@ void unix_error(char *msg);
 void app_error(char *msg);
 typedef void handler_t(int);
 handler_t *Signal(int signum, handler_t *handler);
+volatile sig_atomic_t sharedPid;
 
 /*
  * main - The shell's main routine 
@@ -203,7 +204,10 @@ void eval(char *cmdline)
 	char *argv1[MAXARGS]; /* argv for execve() */
 	char *argv2[MAXARGS]; /* argv for second command execve() */
 	int bg;				  /* should the job run in bg or fg? */
+	int isBuiltInCmd;
 	pid_t pid;
+	__sigset_t sigSet;
+	struct job_t *temp;
 
 	/* If the line contains two commands, split into two strings */
 	char *cmd2 = strchr(cmdline, '|');
@@ -226,35 +230,48 @@ void eval(char *cmdline)
 	if (cmd2 != NULL)
 		parseline(cmd2, argv2, 2);
 
-	addjob(jobs, getpid(), bg, cmdline);
+	sigemptyset(&sigSet);
+	sigaddset(&sigSet, SIGCHLD);
 
-	if (bg)
+	isBuiltInCmd = builtin_cmd(&argv1[0]);
+
+	if (isBuiltInCmd == 0)
 	{
-		do_bg(nextjid - 1);
+		sigprocmask(SIG_BLOCK, &sigSet, NULL);
+		pid = fork();
+		if (pid == 0)
+		{
+			sigprocmask(SIG_UNBLOCK, &sigSet, NULL);
+			if(setpgid(0, 0) != 0)
+			{
+				unix_error("\nSetpgid() error.\n");               
+			}
+			char *envp[1] = {NULL};
+			if (execve(argv1[0], argv1, envp) <= -1)
+			{
+				printf("unknown command: %s\n", argv1[0]);
+				fflush(stdout);
+				exit(0);
+			}
+		}
+
+		addjob(jobs, pid, bg + 1, cmdline);		
+		temp = getjobpid(jobs, pid);
+		sigprocmask(SIG_UNBLOCK, &sigSet, NULL);		
+	}
+
+	if(bg == 0)
+	{
+		waitfg(pid);
 	}
 	else
 	{
-		// wait until this is done, then return
-		do_fg(nextjid - 1);
+	    printf("[%d] (%d) %s", temp->jid, pid, cmdline);
 	}
-
-	// Execute second command
-	// if (cmd2 != NULL)
-	// {
-	// 	char *envp2[1] = {NULL};
-	// 	if (strcmp(argv2[0], "CLOSE") == 0 || strcmp(argv2[0], "quit") == 0)
-	// 	{
-	// 		exit(builtin_cmd(&argv2[0]));
-	// 	}
-	// 	if (execve(argv2[0], argv2, envp2) == -1)
-	// 	{
-	// 		printf("unknown command: %s\n", argv2[0]);
-	// 		exit(1);
-	// 	}
-	// }
 
 	return;
 }
+
 
 /* 
  * parseline - Parse the command line and build the argv array.
@@ -335,10 +352,6 @@ int builtin_cmd(char **argv)
 {
 	char *cmd = argv[0];
 
-	// TODO: Implement "quit" and "jobs" commands
-	//       "bg" and "fg" commands are partially handled here,
-	//       but you need to implement the do_bg and do_fg functions.
-
 	if (!strcmp(cmd, "bg") || !strcmp(cmd, "fg"))
 	{ /* bg and fg commands */
 
@@ -373,9 +386,9 @@ int builtin_cmd(char **argv)
 		return 1;
 	}
 
-	if (strcmp(cmd, "quit"))
+	if (strcmp(cmd, "quit") == 0)
 	{
-		return 1;
+		exit(0);
 	}
 
 	return 0; /* not a builtin command */
@@ -386,34 +399,16 @@ int builtin_cmd(char **argv)
  */
 void do_bg(int jid)
 {
-	char *argv1[MAXARGS]; /* argv for execve() */
-	int bg = parseline(jobs[jid].cmdline, argv1, 1);
-
-	if (strcmp(argv1[0], "CLOSE") == 0 || strcmp(argv1[0], "quit") == 0)
+	struct job_t *temp;
+	if(kill(-(temp->pid),SIGCONT) < 0) 
 	{
-		exit(builtin_cmd(&argv1[0]));
+		unix_error("error loading into background");
 	}
-
-	// Child process runs the not built in command
-	pid_t pid = fork();
-
-	if (pid == 0)
+	else
 	{
-		char *envp[1] = {NULL};
-		if (execve(argv1[0], argv1, envp) == -1)
-		{
-			printf("unknown command: %s\n", argv1[0]);
-			exit(1);
-		}
-	}
-
-	// parent: wait on foreground process to finish
-	if (!bg)
-	{
-		int status;
-		waitpid(pid, &status, 0);
-	}
-
+		temp->state=BG;
+		printf("[%d] (%d) %s",temp->jid,temp->pid,temp->cmdline);	
+	}	
 	return;
 }
 
@@ -422,22 +417,17 @@ void do_bg(int jid)
  */
 void do_fg(int jid)
 {
-	char *argv1[MAXARGS]; /* argv for execve() */
-	int bg = parseline(jobs[jid].cmdline, argv1, 1);
-
-	if (strcmp(argv1[0], "CLOSE") == 0 || strcmp(argv1[0], "quit") == 0)
+	struct job_t *temp;
+	if(kill(-(temp->pid),SIGCONT) < 0) 
 	{
-		exit(builtin_cmd(&argv1[0]));
+    	unix_error("error loading into foreground");
 	}
-
-	// Child process runs the not built in command
-	char *envp[1] = {NULL};
-	if (execve(argv1[0], argv1, envp) == -1)
-	{
-		printf("unknown command: %s\n", argv1[0]);
-		exit(1);
-	}
-
+    else
+    {
+      temp->state = FG;
+      waitfg( temp->pid );
+    }
+        
 	return;
 }
 
@@ -446,6 +436,17 @@ void do_fg(int jid)
  */
 void waitfg(pid_t pid)
 {
+	struct job_t* temp;
+	// Loop while this job is in the forground
+	while(temp = getjobpid(jobs, pid)) 
+	{ 
+		// once the job is no longer in the foreground
+		// then stop waiting
+		if(temp->state != FG)
+		{
+			break;
+		}
+	}
 	return;
 }
 
@@ -462,6 +463,29 @@ void waitfg(pid_t pid)
  */
 void sigchld_handler(int sig)
 {
+	int status;
+	pid_t pid;
+
+	while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+	{
+		if(WIFSTOPPED(status))
+		{
+			getjobpid(jobs, pid)->state = ST;
+			printf("Job [%d] (%d) stopped by signal %d\n", pid2jid(pid), pid, WSTOPSIG(status));
+		}
+		else if(WIFSIGNALED(status))
+		{
+			if(WTERMSIG(status) == SIGINT)
+			{
+				printf("Job [%d] (%d) terminated by signal %d\n", pid2jid(pid), pid, WTERMSIG(status));
+				deletejob(jobs, pid);
+			}
+		}
+		else if(WIFEXITED(status))
+		{
+			deletejob(jobs, pid);
+		}
+	}
 	return;
 }
 
@@ -472,7 +496,29 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig)
 {
+	int jid;
+	pid_t pid;
+	pid = currFgPid();
+	jid = pid2jid(pid);
+	if(pid != -99 && jid != 0)
+	{
+		kill(pid, SIGINT);
+	}
 	return;
+}
+
+pid_t currFgPid()
+{
+	int i;
+
+	for(i = 0; i < MAXJOBS; ++i)
+	{
+		if(jobs[i].state == FG)
+		{
+			return jobs[i].pid;
+		}
+	}
+	return -99;
 }
 
 /*
@@ -482,6 +528,14 @@ void sigint_handler(int sig)
  */
 void sigtstp_handler(int sig)
 {
+	int jid;
+	pid_t pid;
+	pid = currFgPid();
+	jid = pid2jid(pid);
+	if(pid != 0 && jid != 0)
+	{
+		kill(pid, SIGTSTP);
+	}
 	return;
 }
 
