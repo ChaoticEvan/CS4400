@@ -404,16 +404,10 @@ int builtin_cmd(char **argv)
  */
 void do_bg(int jid)
 {
-	struct job_t *temp;
-	if(kill(-(temp->pid),SIGCONT) < 0) 
-	{
-		unix_error("error loading into background");
-	}
-	else
-	{
-		temp->state=BG;
-		printf("[%d] (%d) %s",temp->jid,temp->pid,temp->cmdline);	
-	}	
+	struct job_t *temp = getjobjid(jobs, jid);
+	kill(-(temp->pid), SIGCONT);
+	temp->state = BG;
+	printf("[%d] (%d) %s", pid2jid(temp->pid), temp->pid, temp->cmdline);	
 	return;
 }
 
@@ -422,17 +416,12 @@ void do_bg(int jid)
  */
 void do_fg(int jid)
 {
-	struct job_t *temp;
-	if(kill(-(temp->pid),SIGCONT) < 0) 
-	{
-    	unix_error("error loading into foreground");
-	}
-    else
-    {
-      temp->state = FG;
-      waitfg( temp->pid );
-    }
-        
+	struct job_t *temp = getjobjid(jobs, jid);
+	temp->state = FG;
+	if(kill(-(temp->pid), SIGCONT) < 0)
+	printf("error in fgbg sigcont\n");
+	//wait here until new foreground job is finished
+	waitfg(temp->pid);
 	return;
 }
 
@@ -471,7 +460,7 @@ void sigchld_handler(int sig)
 	int status;
 	pid_t pid;
 
-	while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+	while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0)
 	{
 		if(WIFSTOPPED(status))
 		{
@@ -524,6 +513,7 @@ pid_t currFgPid()
 		}
 	}
 	return -99;
+
 }
 
 /*
