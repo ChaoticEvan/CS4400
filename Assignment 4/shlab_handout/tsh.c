@@ -418,9 +418,7 @@ void do_fg(int jid)
 {
 	struct job_t *temp = getjobjid(jobs, jid);
 	temp->state = FG;
-	if(kill(-(temp->pid), SIGCONT) < 0)
-	printf("error in fgbg sigcont\n");
-	//wait here until new foreground job is finished
+	kill(-(temp->pid), SIGCONT);
 	waitfg(temp->pid);
 	return;
 }
